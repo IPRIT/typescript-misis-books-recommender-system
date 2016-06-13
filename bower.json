@@ -1,0 +1,25 @@
+{
+  "name": "TypeScript-Recommender-System",
+  "version": "0.0.1",
+  "authors": [
+    "Alexander Belov <ipritoflex@yandex.ru>"
+  ],
+  "main": "bin/www",
+  "keywords": [
+    "angular",
+    "recommender system"
+  ],
+  "license": "BSD",
+  "ignore": [
+    "app/bower_components"
+  ],
+  "dependencies": {
+    "seedrandom": "^2.4.2",
+    "angular": "~1.5.3",
+    "angular-sanitize": "~1.5.3",
+    "angular-route": "~1.5.3",
+    "angular-ui-router": "~0.2.15",
+    "angular-material": "~1.0.6",
+    "angular-messages": "~1.5.3"
+  }
+}
