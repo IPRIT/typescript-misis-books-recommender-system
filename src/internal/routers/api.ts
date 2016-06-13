@@ -24,15 +24,15 @@ router.get('/getRecommendations', function (req, res) {
       }
       let userId = response.user && response.user.id;
       let recSystem = new RecommendationsEvaluator(rsToken);
-      recSystem.getRecommendations(userId, { count, offset, category })
-        .then(result => {
-          res.json(result);
-        })
-        .catch(err => {
-          res.json({
-            error: err.toString()
-          });
-        });
+      return recSystem.getRecommendations(userId, { count, offset, category });
+    })
+    .then(result => {
+      res.json(result);
+    })
+    .catch(err => {
+      res.json({
+        error: err.toString()
+      });
     });
 });
 
