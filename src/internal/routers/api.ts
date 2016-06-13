@@ -24,7 +24,7 @@ router.get('/getRecommendations', function (req, res) {
       }
       let userId = response.user && response.user.id;
       let recSystem = new RecommendationsEvaluator(rsToken);
-      recSystem.getRecommendations(userId, count, offset, category)
+      recSystem.getRecommendations(userId, { count, offset, category })
         .then(result => {
           res.json(result);
         })

@@ -7,6 +7,9 @@ var Promise = require('es6-promise').Promise;
 
 export class FactorsComputation {
 
+  learnEps = 1e-6;
+  minLearnIterations = 10000;
+
   dataSetUsers = {};
   dataSetItems = {};
   dataSetMatrix = {};
@@ -131,9 +134,8 @@ export class FactorsComputation {
   }
 
   learn() {
-    let eps = 1e-6;
     return new Promise((resolve, reject) => {
-      while (Math.abs(this.rmseOld - this.rmse) > eps || this.iterationNumber < 10000) {
+      while (Math.abs(this.rmseOld - this.rmse) > this.learnEps || this.iterationNumber < this.minLearnIterations) {
         this.rmseOld = this.rmse;
         this.rmse = 0;
 

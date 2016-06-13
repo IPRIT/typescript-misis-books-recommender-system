@@ -1,12 +1,24 @@
 import {FactorsStore} from "../Factors/FactorsStore";
 import {FactorsComputation} from "../Factors/FactorsComputation";
 import {ItemsCollator} from "./ItemsCollator";
+import {CacheStore} from "./CacheStore";
 var Promise = require('es6-promise').Promise;
 
 /**
  * Created by Александр on 12.06.2016.
  */
 
+export interface IQueryParams {
+  count: number,
+  offset: number,
+  category: number
+}
+
+export interface IPrediction {
+  item_id: number,
+  forecastRate: number
+}
+  
 export class RecommendationsEvaluator {
 
   store: FactorsStore;
@@ -15,19 +27,28 @@ export class RecommendationsEvaluator {
     this.store = FactorsStore.getInstance();
   }
 
-  getRecommendations(userId: number, count: number = 10, offset: number = 0, category: number = 1) {
+  getRecommendations(userId: number, queryParams: IQueryParams = {count: 10, offset: 0, category: 1}) {
     return new Promise((resolve, reject) => {
       if (!this.store.isReady) {
         return reject(new Error('Recommender model is not ready'));
       } else if (!this.store.userExists( this.getUserKeyById(userId) )) {
         return reject(new Error('Recommender model does not contain this user'));
       }
-      let forecastCollection = this.computeForecastCollection(userId, category);
+
+      let cacheStore = CacheStore.getInstance();
+      let forecastCollection;
+      if (cacheStore.areItemsExists(userId, queryParams)) {
+        forecastCollection = cacheStore.getItems(userId, queryParams);
+      } else {
+        forecastCollection = this.computeForecastCollection(userId, queryParams.category);
+        cacheStore.storeItems(userId, queryParams, forecastCollection);
+      }
+
       let itemsId = forecastCollection.map(item => item.item_id)
-        .slice(offset, offset + count);
+        .slice(queryParams.offset, queryParams.offset + queryParams.count);
 
       let collator = new ItemsCollator();
-      collator.collateItems(itemsId, category, this.rsToken)
+      collator.collateItems(itemsId, queryParams.category, this.rsToken)
         .then(result => {
           if (result.items) {
             result.items = result.items.map((item, index) => {
@@ -42,7 +63,7 @@ export class RecommendationsEvaluator {
     });
   }
 
-  private computeForecastCollection(userId: number, category: number = 1) {
+  private computeForecastCollection(userId: number, category: number = 1): Array<IPrediction> {
     let state = this.store.state;
     let itemsKeyList = Object.keys(state.itemsFeatureVectors)
       .filter(itemKey => {
