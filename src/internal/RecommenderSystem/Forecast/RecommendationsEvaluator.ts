@@ -52,7 +52,7 @@ export class RecommendationsEvaluator {
         .then(result => {
           if (result.items) {
             result.items = result.items.map((item, index) => {
-              item.forecastRate = forecastCollection[index].forecastRate;
+              item.forecastRate = forecastCollection[queryParams.offset + index].forecastRate;
               return item;
             });
           }
